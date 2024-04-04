@@ -1,36 +1,53 @@
+use nostr_sdk::{async_utility::futures_util::future::ok, bitcoin::network::message};
 use reqwest::Error;
 use rss::Channel;
 
-pub async fn fetch_user_info(url: &str) -> Result<(String, String), Error> {
-    let response = reqwest::get(url).await?.bytes().await?;
-    let channel = Channel::read_from(&response[..]).unwrap();
+pub struct Fetcher {}
 
-    let title = channel.title().to_string();
-    let image_url = channel
-        .image()
-        .map(|image| image.url().to_string())
-        .unwrap_or("No image URL".to_string());
-
-    Ok((title, image_url))
+pub struct UserInfo {
+    pub title: String,
+    pub image_url: String,
 }
 
-pub async fn fetch_messages(url: &str) -> Result<Vec<(String, String, String)>, Error> {
-    let response = reqwest::get(url).await?.bytes().await?;
-    let channel = Channel::read_from(&response[..]).unwrap();
+pub struct Message {
+    pub title: String,
+    pub link: String,
+    pub description: String,
+}
 
-    let messages = channel
-        .items()
-        .into_iter()
-        .map(|item| {
-            let title = item.title().unwrap_or("No title").to_string();
-            let link = item.link().unwrap_or("No link").to_string();
-            let description = item.description().unwrap_or("No description").to_string();
+impl Fetcher {
+    pub async fn fetch_user_info(url: &str) -> Result<UserInfo, Error> {
+        let response = reqwest::get(url).await?.bytes().await?;
+        let channel = Channel::read_from(&response[..]).unwrap();
 
-            (title, link, description)
-        })
-        .collect();
+        let title = channel.title().to_string();
+        let image_url = channel
+            .image()
+            .map(|image| image.url().to_string())
+            .unwrap_or("No image URL".to_string());
+        Ok(UserInfo { title, image_url })
+    }
 
-    Ok(messages)
+    pub async fn fetch_messages(url: &str) -> Result<Vec<Message>, Error> {
+        let response = reqwest::get(url).await?.bytes().await?;
+        let channel = Channel::read_from(&response[..]).unwrap();
+
+        let messages = channel
+            .items()
+            .into_iter()
+            .map(|item| {
+                let title = item.title().unwrap_or("No title").to_string();
+                let link = item.link().unwrap_or("No link").to_string();
+                let description = item.description().unwrap_or("No description").to_string();
+                Message {
+                    title,
+                    link,
+                    description,
+                }
+            })
+            .collect();
+        Ok(messages)
+    }
 }
 
 #[cfg(test)]
