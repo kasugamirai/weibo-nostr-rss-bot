@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+diesel = { version = "2.1.0", features = ["postgres"] }
+dotenvy = "0.15"
+sonic-rs = "0.3.1"
+serde_yaml = "0.9.34"
+diesel_migrations = "2.1.0"
+serde = "1.0"
+log = "0.4.14"
