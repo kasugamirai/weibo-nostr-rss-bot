@@ -1,1 +1,5 @@
 /target
+.gitpod
+.vscode
+.DS_strore
+.idea
