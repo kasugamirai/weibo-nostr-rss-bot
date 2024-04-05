@@ -16,6 +16,9 @@ pub struct Message {
 }
 
 impl Fetcher {
+    pub fn new(){
+        
+    }
     pub async fn fetch_user_info(url: &str) -> Result<UserInfo, Error> {
         let response = reqwest::get(url).await?.bytes().await?;
         let channel = Channel::read_from(&response[..]).unwrap();
