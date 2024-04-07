@@ -1,20 +1,12 @@
 use reqwest::Error;
 use rss::Channel;
+use super::Message;
+use super::UserInfo;
 
 pub struct Fetcher<'a> {
     uid: &'a str,
 }
 
-pub struct UserInfo {
-    pub title: String,
-    pub image_url: String,
-}
-
-pub struct Message {
-    pub title: String,
-    pub link: String,
-    pub description: String,
-}
 
 impl<'a> Fetcher<'a> {
     pub fn new(uid: &'a str) -> Self {
