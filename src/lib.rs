@@ -3,8 +3,11 @@ pub use uid::WeiboUid;
 mod conf;
 mod fetch;
 mod nostr;
+mod msg;
 pub use nostr::NotePublisher;
 use nostr_db::DbConnection;
+pub use msg::Message;
+pub use msg::UserInfo;
 
 pub struct App {
     fetcher: fetch::Fetcher,
