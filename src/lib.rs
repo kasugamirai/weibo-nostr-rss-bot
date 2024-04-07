@@ -1,25 +1,46 @@
 mod uid;
+use nostr_sdk::async_utility::futures_util::TryFutureExt;
 pub use uid::WeiboUid;
 mod conf;
-mod fetch;
+mod rss;
 mod nostr;
 mod msg;
 pub use nostr::NotePublisher;
 use nostr_db::DbConnection;
 pub use msg::Message;
 pub use msg::UserInfo;
+pub use rss::Rss;
+
+const USER_NAME: [&str; 2] = ["23", "2134"];
+const DSN: &str = "123";
+const BASE_URL: &str = "https://weibrss.oneoo.info";
+
 
 pub struct App {
-    fetcher: fetch::Fetcher,
     db: DbConnection,
 }
 
 impl App {
-    pub fn new(fetcher: fetch::Fetcher, db: DbConnection) -> Self {
-        Self { fetcher, db }
+    pub fn new(dsn: &str) -> Self {
+        let db = DbConnection::new(dsn).unwrap_or_else(|e| {
+            panic!("Failed to create database connection: {}", e);
+        });
+        App { db }
     }
-    async fn run() {
-        let fetcher = fetch::Fetcher::new();
+
+    async fn get_uid(&self,name:&str) -> String {
+        let existed = self.db.uid_exists(name).await.unwrap();
+        if !existed {
+            let WeiboUid = WeiboUid::new(BASE_URL);
+
+        }
+        
+        return "ok";
+    }
+    async fn test() {
+        todo!();
+        /*
+        let rss = Rss::new();
         let url = "https://rsshub.app/weibo/user/1883568433";
         let result = fetcher.fetch_user_info(url).await;
 
@@ -35,5 +56,6 @@ impl App {
                 eprintln!("Error: {}", e);
             }
         }
+        */
     }
 }

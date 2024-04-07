@@ -3,14 +3,14 @@ use rss::Channel;
 use super::Message;
 use super::UserInfo;
 
-pub struct Fetcher<'a> {
+pub struct Rss<'a> {
     uid: &'a str,
 }
 
 
-impl<'a> Fetcher<'a> {
+impl<'a> Rss<'a> {
     pub fn new(uid: &'a str) -> Self {
-        Fetcher { uid }
+        Rss { uid }
     }
 
     pub async fn fetch_user_info(&self) -> Result<UserInfo, Error> {
@@ -50,7 +50,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_fetch_user_info() {
-        let fetcher = Fetcher::new("1883568433");
+        let fetcher = Rss::new("1883568433");
         let result = fetcher.fetch_user_info().await;
 
         match result {
@@ -66,7 +66,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_fetch_messages() {
-        let fetcher = Fetcher::new("1883568433");
+        let fetcher = Rss::new("1883568433");
         let result = fetcher.fetch_messages().await;
 
         match result {

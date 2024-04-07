@@ -27,12 +27,12 @@ impl From<reqwest::StatusCode> for Error {
     }
 }
 
-pub struct WeiboUid {
-    base_url: String,
+pub struct WeiboUid<'a> {
+    base_url: &'a str,
 }
 
-impl WeiboUid {
-    pub fn new(base_url: String) -> Self {
+impl<'a> WeiboUid <'a> {
+    pub fn new(base_url: &str) -> Self {
         Self { base_url }
     }
 
@@ -55,7 +55,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_weibo_uid() {
-        let fetcher = WeiboUid::new(BASE_URL.to_string());
+        let fetcher = WeiboUid::new(BASE_URL);
         let result = fetcher.get_weibo_uid("dmmusic").await;
 
         match result {

@@ -1,4 +1,4 @@
-use nostr_db;
+use nostr_db::DbConnection;
 use std::result::Result;
 pub struct UserInfo {
     pub title: String,
@@ -11,6 +11,12 @@ pub struct Message {
     pub description: String,
 }
 
+pub struct Incoming{
+    user_info: UserInfo,
+    msg: Message,
+    db: DbConnection,
+}
+
 impl UserInfo {
     pub fn new(t:String, i:String) -> Self {
         return
@@ -19,9 +25,6 @@ impl UserInfo {
                 image_url:i,
             }
         
-    }
-    pub uid_existed(username:String) -> Result<bool, Error> {
-
     }
 }
 

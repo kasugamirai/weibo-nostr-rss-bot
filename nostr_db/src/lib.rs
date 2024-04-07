@@ -116,7 +116,7 @@ impl DbConnection {
         Ok(results.len() > 0)
     }
 
-    pub async fn channel_exists(&mut self, ch: &str) -> Result<bool, Error> {
+    pub async fn uid_exists(&mut self, ch: &str) -> Result<bool, Error> {
         let results = self.load_users(ch)?;
         Ok(!results.is_empty())
     }
