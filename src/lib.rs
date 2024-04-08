@@ -37,7 +37,7 @@ pub struct MyKey {
 
 impl App {
 
-    pub fn new_key(&self) -> Result<MyKey> {
+    fn new_key(&self) -> Result<MyKey> {
         let my_keys: Keys = Keys::generate();
         let pk = my_keys.public_key().to_bech32()?;
         let prk = my_keys.secret_key()?.to_bech32()?;
@@ -55,7 +55,7 @@ impl App {
         App { db }
     }
 
-    async fn get_uid(& mut self,name:&str) -> Result<String> {
+    pub async fn get_uid(& mut self,name:&str) -> Result<String> {
         let existed = self.db.uid_exists(name).await.unwrap();
         let uid;
         if !existed {
@@ -72,7 +72,7 @@ impl App {
         Ok(uid)
     }
 
-    async fn get_contents(&mut self, uid: &str) -> Result<Vec<Message>> {
+    pub async fn get_contents(&mut self, uid: &str) -> Result<Vec<Message>> {
         let rss = Rss::new(uid);
         let msg = rss.fetch_messages().await?;
         let mut ret = Vec::new(); 
@@ -86,7 +86,7 @@ impl App {
         Ok(ret) 
     }
 
-    async fn publish(&mut self, user_name: &str, message:&str) -> Result<bool> {
+    pub async fn publish(&mut self, user_name: &str, message:&str) -> Result<bool> {
         let secret_key = self.db.find_user_private_key(user_name).await.unwrap().unwrap();
         let key = self.convert_key(&secret_key)?;
         let note_publish = NotePublisher::new(&key, CONF_PATH).await?;
