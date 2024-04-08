@@ -78,8 +78,6 @@ impl DbConnection {
         Ok(())
     }
 
-
-
     fn load_users(&mut self, name: &str) -> Result<Vec<Users>, Error> {
         use crate::schema::users::dsl::*;
         Ok(users
@@ -105,7 +103,7 @@ impl DbConnection {
         Ok(results.first().map(|user| user.u_id.to_string()))
     }
 
-    pub async fn avatar_exists(&mut self, name: &str) -> Result<Option<String>, Error> {
+    pub async fn quert_avatar(&mut self, name: &str) -> Result<Option<String>, Error> {
         let results = self.load_users(name)?;
         Ok(results.first().and_then(|user| user.avatar.clone()))
     }
@@ -190,7 +188,10 @@ impl DbConnection {
             .map(|_| ())?)
     }
 
-    pub async fn find_user_private_key(&mut self, user_name: &str) -> Result<Option<String>, Error> {
+    pub async fn find_user_private_key(
+        &mut self,
+        user_name: &str,
+    ) -> Result<Option<String>, Error> {
         let results = self.load_users(user_name)?;
         Ok(results.first().map(|user| user.privatekey.to_string()))
     }
