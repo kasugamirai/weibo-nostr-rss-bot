@@ -73,11 +73,13 @@ impl App {
     async fn get_contents(&mut self, uid: &str) -> Result<Vec<Message>> {
         let rss = Rss::new(uid);
         let msg = rss.fetch_messages().await?;
-        let mut ret = Vec::new(); // Initialize ret as an empty vector
+        let mut ret = Vec::new(); 
         for m in msg {
             let existed = self.db.content_exists(&m.link).await.unwrap();
             if !existed {
+                self.db.add_contents(au, ti, lk, de, pu).await.unwrap();
                 ret.push(m);
+
             }
         }
         Ok(ret) 

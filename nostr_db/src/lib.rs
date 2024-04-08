@@ -156,10 +156,10 @@ impl DbConnection {
 
     pub async fn add_contents(
         &mut self,
-        au: String,
-        ti: String,
-        lk: String,
-        de: String,
+        au: &str,
+        ti: &str,
+        lk: &str,
+        de: &str,
         pu: bool,
     ) -> Result<(), Error> {
         use crate::schema::contents::dsl::*;
@@ -170,10 +170,10 @@ impl DbConnection {
             .expect("User should exist at this point");
 
         let new_content = NewContents {
-            author: au,
-            title: ti,
-            link: lk,
-            description: de,
+            author: au.to_string(),
+            title: ti.to_string(),
+            link: lk.to_string(),
+            description: de.to_string(),
             published: pu,
             user_id: u,
         };
