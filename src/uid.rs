@@ -33,7 +33,7 @@ pub struct WeiboUid<'a> {
 }
 
 impl<'a> WeiboUid <'a> {
-    pub fn new(base_url: &str) -> Self {
+    pub fn new(base_url: &'a str) -> Self {
         Self { base_url }
     }
 

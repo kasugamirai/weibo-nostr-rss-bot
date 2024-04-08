@@ -63,32 +63,25 @@ impl App {
             let rss  = Rss::new(&uid);
             let uifo = rss.fetch_user_info().await?;
             let key  =   self.new_key()?;
-            self.db.add_user(name, &uifo.image_url, &key.public_key, &key.secret_key, uidi32);
+            self.db.add_user(name, &uifo.image_url, &key.public_key, &key.secret_key, uidi32).await.unwrap();
         } else {
              uid = self.db.query_u_id(name).await.unwrap().unwrap();
         }
         Ok(uid)
     }
 
-    async fn test() {
-        todo!();
-        /*
-        let rss = Rss::new();
-        let url = "https://rsshub.app/weibo/user/1883568433";
-        let result = fetcher.fetch_user_info(url).await;
-
-        match result {
-            Ok((title, image_url)) => {
-                let message_url = "https://rsshub.app/weibo/user/1883568433";
-                let messages = fetcher.fetch_messages(message_url).await.unwrap();
-                for message in messages {
-                    db.save_message(&message).await.unwrap();
-                }
-            }
-            Err(e) => {
-                eprintln!("Error: {}", e);
+    async fn get_contents(&mut self, uid: &str) -> Result<Vec<Message>> {
+        let rss = Rss::new(uid);
+        let msg = rss.fetch_messages().await?;
+        let mut ret = Vec::new(); // Initialize ret as an empty vector
+        for m in msg {
+            let existed = self.db.content_exists(&m.link).await.unwrap();
+            if !existed {
+                ret.push(m);
             }
         }
-        */
+        Ok(ret) 
     }
+
+
 }
