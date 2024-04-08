@@ -78,6 +78,8 @@ impl DbConnection {
         Ok(())
     }
 
+
+
     fn load_users(&mut self, name: &str) -> Result<Vec<Users>, Error> {
         use crate::schema::users::dsl::*;
         Ok(users
@@ -103,8 +105,8 @@ impl DbConnection {
         Ok(results.first().map(|user| user.u_id.to_string()))
     }
 
-    pub async fn avatar_exists(&mut self, ch: &str) -> Result<Option<String>, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn avatar_exists(&mut self, name: &str) -> Result<Option<String>, Error> {
+        let results = self.load_users(name)?;
         Ok(results.first().and_then(|user| user.avatar.clone()))
     }
 
@@ -156,10 +158,10 @@ impl DbConnection {
 
     pub async fn add_contents(
         &mut self,
-        au: String,
-        ti: String,
-        lk: String,
-        de: String,
+        au: &str,
+        ti: &str,
+        lk: &str,
+        de: &str,
         pu: bool,
     ) -> Result<(), Error> {
         use crate::schema::contents::dsl::*;
@@ -170,10 +172,10 @@ impl DbConnection {
             .expect("User should exist at this point");
 
         let new_content = NewContents {
-            author: au,
-            title: ti,
-            link: lk,
-            description: de,
+            author: au.to_string(),
+            title: ti.to_string(),
+            link: lk.to_string(),
+            description: de.to_string(),
             published: pu,
             user_id: u,
         };
@@ -188,13 +190,13 @@ impl DbConnection {
             .map(|_| ())?)
     }
 
-    pub async fn find_user_private_key(&mut self, ch: &str) -> Result<Option<String>, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn find_user_private_key(&mut self, user_name: &str) -> Result<Option<String>, Error> {
+        let results = self.load_users(user_name)?;
         Ok(results.first().map(|user| user.privatekey.to_string()))
     }
 
-    pub async fn find_user_public_key(&mut self, ch: &str) -> Result<Option<String>, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn find_user_public_key(&mut self, user_name: &str) -> Result<Option<String>, Error> {
+        let results = self.load_users(user_name)?;
         Ok(results.first().map(|user| user.publickey.to_string()))
     }
 }
