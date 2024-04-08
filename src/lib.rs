@@ -91,6 +91,7 @@ impl App {
         let key = self.convert_key(&secret_key)?;
         let note_publish = NotePublisher::new(&key, CONF_PATH).await?;
         note_publish.connect().await;
+        let_ = note_publish.set_metadata(username, avatar);
         let _ = note_publish.publish_text_note(&key, message).await;
         note_publish.disconnect().await;
         Ok(true)
