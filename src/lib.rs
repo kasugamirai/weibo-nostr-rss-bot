@@ -16,8 +16,6 @@ use nostr_db::DbConnection;
 pub use rss::Rss;
 use std::str::FromStr;
 
-const USER_NAME: [&str; 2] = ["23", "2134"];
-const DSN: &str = "123";
 const BASE_URL: &str = "https://weibrss.oneoo.info";
 const CONF_PATH: &str = "../conf";
 
