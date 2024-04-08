@@ -123,19 +123,19 @@ impl DbConnection {
 
     pub async fn add_user(
         &mut self,
-        un: String,
-        av: String,
-        pk: String,
-        prk: String,
+        un: &str,
+        av: &str,
+        pk: &str,
+        prk: &str,
         uid: i32,
     ) -> Result<(), Error> {
         use crate::schema::users::dsl::*;
 
         let new_user = NewUsers {
-            username: un,
-            avatar: Some(av),
-            publickey: pk,
-            privatekey: prk,
+            username: un.to_string(),
+            avatar: Some(av.to_string()),
+            publickey: pk.to_string(),
+            privatekey: prk.to_string(),
             u_id: uid,
         };
 

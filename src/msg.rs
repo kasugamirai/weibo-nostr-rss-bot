@@ -1,10 +1,13 @@
 use nostr_db::DbConnection;
 use std::result::Result;
+
+#[derive(Debug)]
 pub struct UserInfo {
     pub title: String,
     pub image_url: String,
 }
 
+#[derive(Debug)]
 pub struct Message {
     pub title: String,
     pub link: String,
