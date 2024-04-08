@@ -188,13 +188,13 @@ impl DbConnection {
             .map(|_| ())?)
     }
 
-    pub async fn find_user_private_key(&mut self, ch: &str) -> Result<Option<String>, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn find_user_private_key(&mut self, user_name: &str) -> Result<Option<String>, Error> {
+        let results = self.load_users(user_name)?;
         Ok(results.first().map(|user| user.privatekey.to_string()))
     }
 
-    pub async fn find_user_public_key(&mut self, ch: &str) -> Result<Option<String>, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn find_user_public_key(&mut self, user_name: &str) -> Result<Option<String>, Error> {
+        let results = self.load_users(user_name)?;
         Ok(results.first().map(|user| user.publickey.to_string()))
     }
 }

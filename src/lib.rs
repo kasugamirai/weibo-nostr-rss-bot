@@ -1,6 +1,6 @@
 mod uid;
 use nostr_sdk::async_utility::futures_util::TryFutureExt;
-use nostr_sdk::secp256k1::SecretKey;
+use nostr_sdk::SecretKey;
 use anyhow::{Result, anyhow};
 use nostr_sdk::Keys;
 use nostr_sdk::ToBech32;
@@ -14,11 +14,13 @@ use nostr_db::DbConnection;
 pub use msg::Message;
 pub use msg::UserInfo;
 pub use rss::Rss;
+use std::str::FromStr;
 use std::string::String;
 
 const USER_NAME: [&str; 2] = ["23", "2134"];
 const DSN: &str = "123";
 const BASE_URL: &str = "https://weibrss.oneoo.info";
+const CONF_PATH: &str = "../conf";
 
 
 pub struct App {
@@ -77,13 +79,27 @@ impl App {
         for m in msg {
             let existed = self.db.content_exists(&m.link).await.unwrap();
             if !existed {
-                self.db.add_contents(au, ti, lk, de, pu).await.unwrap();
+                self.db.add_contents(uid, &m.link, &m.link, &m.description, false).await.unwrap();
                 ret.push(m);
-
             }
         }
         Ok(ret) 
     }
 
+    async fn publish(&mut self, user_name: &str, message:&str) -> Result<bool> {
+        let secret_key = self.db.find_user_private_key(user_name).await.unwrap().unwrap();
+        let key = self.convert_key(&secret_key)?;
+        let note_publish = NotePublisher::new(&key, CONF_PATH).await?;
+        note_publish.connect().await;
+        let _ = note_publish.publish_text_note(&key, message).await;
+        note_publish.disconnect().await;
+        Ok(true)
+    }
+
+    fn convert_key(&self, secret_key: &str) -> Result<Keys> {
+        let sk = SecretKey::from_str(secret_key)?;
+        let key = Keys::new(sk);
+        Ok(key)
+    }
 
 }
