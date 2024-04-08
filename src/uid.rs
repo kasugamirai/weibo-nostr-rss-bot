@@ -2,6 +2,7 @@ use std::fmt;
 
 const BASE_URL: &str = "https://weibrss.oneoo.info";
 
+#[derive(Debug)]
 pub enum Error {
     Reqwest(reqwest::Error),
     HttpError(reqwest::StatusCode),
@@ -36,8 +37,8 @@ impl<'a> WeiboUid <'a> {
         Self { base_url }
     }
 
-    pub async fn get_weibo_uid(&self, domain: &str) -> Result<String, Error> {
-        let url = format!("{}/convert?domain={}", self.base_url, domain);
+    pub async fn get_weibo_uid(&self, user_name: &str) -> Result<String, Error> {
+        let url = format!("{}/convert?domain={}", self.base_url, user_name);
         let response = reqwest::get(&url).await?;
 
         if response.status().is_success() {
