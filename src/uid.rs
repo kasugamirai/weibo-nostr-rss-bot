@@ -8,6 +8,8 @@ pub enum Error {
     HttpError(reqwest::StatusCode),
 }
 
+impl std::error::Error for Error {}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -32,7 +34,7 @@ pub struct WeiboUid<'a> {
     base_url: &'a str,
 }
 
-impl<'a> WeiboUid <'a> {
+impl<'a> WeiboUid<'a> {
     pub fn new(base_url: &'a str) -> Self {
         Self { base_url }
     }

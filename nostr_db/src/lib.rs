@@ -1,12 +1,10 @@
 mod models;
 mod schema;
 
-use crate::models::{Config, Contents, NewContents, NewUsers, Users};
+use crate::models::{Contents, NewContents, NewUsers, Users};
 use diesel::RunQueryDsl;
 use diesel::{Connection, ExpressionMethods, PgConnection, QueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use std::fs::File;
-use std::io::BufReader;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../nostr_db/migrations");
 
@@ -42,6 +40,8 @@ impl From<serde_yaml::Error> for Error {
     }
 }
 
+impl std::error::Error for Error {}
+
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
@@ -57,17 +57,9 @@ pub struct DbConnection {
     conn: PgConnection,
 }
 
-fn load_conf(config_path: &str) -> Result<Config, Error> {
-    let file = File::open(config_path)?;
-    let reader = BufReader::new(file);
-    let conf = serde_yaml::from_reader(reader)?;
-    Ok(conf)
-}
-
 impl DbConnection {
     pub fn new(dsn: &str) -> Result<DbConnection, Error> {
-        let conf = load_conf(dsn)?;
-        let conn = PgConnection::establish(&conf.dsn)?;
+        let conn = PgConnection::establish(dsn)?;
         Ok(DbConnection { conn })
     }
 

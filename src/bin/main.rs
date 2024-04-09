@@ -1,40 +1,31 @@
+use nostr_sdk::bitcoin::network::message;
+use nostr_sdk::nips::nip26::Error::ConditionsParseInvalidCondition;
+use reqwest::Error;
 use std::fs::File;
 use std::io::BufReader;
-use nostr_sdk::base64::engine::Config;
-use nostr_sdk::bitcoin::network::message;
-use reqwest::Error;
+use weibo_nostr::load_conf;
 use weibo_nostr::App;
-
+use weibo_nostr::Config;
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
+    let conf = load_conf("config/conf.yaml").unwrap();
+    let dsn = conf.postgres.dsn;
+    let names = conf.user.name;
 
-    let file = match File::open("./conf/test/config.yaml") {
-        Ok(file) => file,
-        Err(e) => {
-            log::error!("Failed to open config file: {}", e);
-            return;
+    let mut app = App::new(&dsn);
+    for name in names {
+        let uid = match app.get_uid(&name).await {
+            Ok(uid) => uid,
+            Err(e) => {
+                eprintln!("Invalid user ID: {}, {}", name, e);
+                continue;
+            }
+        };
+        let messages = app.get_contents(&uid).await.unwrap();
+        for msg in messages {
+            let _ = app.publish(&name, &msg.description).await.unwrap();
         }
-    };
-
-    let reader = BufReader::new(file);
-
-    let config: Config = match serde_yaml::from_reader(reader) {
-        Ok(config) => config,
-        Err(e) => {
-            log::error!("Failed to read config: {}", e);
-            return;
-        }
-    };
-
-    let dsn = config.dsn;
-    let name = config.name;
-
-    let mut app = App::new(dsn);
-    let uid = app.get_uid(NAME).await.unwrap();
-    let messages = app.get_contents(&uid).await.unwrap();
-    for msg in messages {
-        let _ = app.publish(NAME, &msg.description).await.unwrap();
     }
 }

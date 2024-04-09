@@ -46,8 +46,3 @@ pub struct NewUsers {
     pub privatekey: String,
     pub u_id: i32,
 }
-
-#[derive(Debug, Deserialize)]
-pub struct Config {
-    pub dsn: String,
-}

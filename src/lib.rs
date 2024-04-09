@@ -1,5 +1,6 @@
 mod uid;
 use anyhow::{anyhow, Result};
+pub use conf::load_conf;
 use nostr_sdk::async_utility::futures_util::TryFutureExt;
 use nostr_sdk::Keys;
 use nostr_sdk::SecretKey;
@@ -9,6 +10,7 @@ mod conf;
 mod msg;
 mod nostr;
 mod rss;
+pub use conf::Config;
 pub use msg::Message;
 pub use msg::UserInfo;
 pub use nostr::NotePublisher;
@@ -49,11 +51,11 @@ impl App {
     }
 
     pub async fn get_uid(&mut self, name: &str) -> Result<String> {
-        let existed = self.db.uid_exists(name).await.unwrap();
+        let existed = self.db.uid_exists(name).await?;
         let uid;
         if !existed {
             let weibo_uid = WeiboUid::new(BASE_URL);
-            uid = weibo_uid.get_weibo_uid(name).await.unwrap();
+            uid = weibo_uid.get_weibo_uid(name).await?;
             let uidi32: i32 = uid.parse()?;
             let rss = Rss::new(&uid);
             let uifo = rss.fetch_user_info().await?;
