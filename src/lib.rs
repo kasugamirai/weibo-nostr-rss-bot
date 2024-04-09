@@ -1,5 +1,5 @@
 mod uid;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 pub use conf::load_conf;
 use nostr_sdk::async_utility::futures_util::TryFutureExt;
 use nostr_sdk::serde_json;
@@ -7,6 +7,7 @@ use nostr_sdk::serde_json::de;
 use nostr_sdk::Keys;
 use nostr_sdk::SecretKey;
 use nostr_sdk::ToBech32;
+use scraper::Html;
 pub use uid::WeiboUid;
 mod conf;
 mod msg;
@@ -105,7 +106,7 @@ impl App {
         Ok(ret)
     }
 
-    pub async fn publish(&mut self, user_name: &str, message: &str) -> Result<bool> {
+    pub async fn publish(&mut self, user_name: &str, message: &str) -> Result<()> {
         let secret_key = match self.db.find_user_private_key(user_name).await {
             Ok(Some(key)) => key,
             Ok(None) => {
@@ -149,15 +150,16 @@ impl App {
         if let Err(e) = note_publish.set_metadata(&user_name, &avatar).await {
             log::error!("Failed to set metadata: {}", e);
         }
+        let plain_text_message = html_to_text(&message);
         if let Err(e) = note_publish
-            .publish_text_note(&key, &format!("{}", message))
+            .publish_text_note(&key, &format!("{}", plain_text_message))
             .await
         {
             log::error!("Failed to publish text note: {}", e);
         }
         note_publish.disconnect().await;
 
-        Ok(true)
+        Ok(())
     }
 
     fn convert_key(&self, secret_key: &str) -> Result<Keys> {
@@ -165,4 +167,11 @@ impl App {
         let key = Keys::new(sk);
         Ok(key)
     }
+}
+
+fn html_to_text(html: &str) -> String {
+    let document = Html::parse_document(html);
+    let body = document.root_element();
+    let text_nodes = body.text();
+    text_nodes.collect::<Vec<_>>().join(" ")
 }

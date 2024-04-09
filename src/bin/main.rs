@@ -1,11 +1,5 @@
-use nostr_sdk::bitcoin::network::message;
-use nostr_sdk::nips::nip26::Error::ConditionsParseInvalidCondition;
-use reqwest::Error;
-use std::fs::File;
-use std::io::BufReader;
 use weibo_nostr::load_conf;
 use weibo_nostr::App;
-use weibo_nostr::Config;
 
 #[tokio::main]
 async fn main() {
@@ -28,7 +22,6 @@ async fn main() {
             .await
             .expect("Failed to get messages");
         for msg in messages {
-            println!("Publishing message: {} ", msg.title);
             match app.publish(&name, &msg.description).await {
                 Ok(_) => (),
                 Err(e) => eprintln!("Failed to publish message: {}", e),
