@@ -19,7 +19,7 @@ diesel::table! {
         avatar -> Nullable<Varchar>,
         publickey -> Varchar,
         privatekey -> Varchar,
-        u_id -> Int4,
+        u_id -> Int8,
     }
 }
 

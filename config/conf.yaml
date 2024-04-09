@@ -1,7 +1,7 @@
 user:
   name:
-    - dmmusic
     - vinczhon
+    - dmmusic
 
 postgres:
   dsn: postgres://localhost:5432/weibo

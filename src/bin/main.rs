@@ -23,9 +23,16 @@ async fn main() {
                 continue;
             }
         };
-        let messages = app.get_contents(&uid).await.unwrap();
+        let messages = app
+            .get_contents(&uid)
+            .await
+            .expect("Failed to get messages");
         for msg in messages {
-            let _ = app.publish(&name, &msg.description).await.unwrap();
+            println!("Publishing message: {} ", msg.title);
+            match app.publish(&name, &msg.description).await {
+                Ok(_) => (),
+                Err(e) => eprintln!("Failed to publish message: {}", e),
+            }
         }
     }
 }

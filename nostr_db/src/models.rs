@@ -34,7 +34,7 @@ pub struct Users {
     pub avatar: Option<String>,
     pub publickey: String,
     pub privatekey: String,
-    pub u_id: i32,
+    pub u_id: i64,
 }
 
 #[derive(Insertable)]
@@ -44,5 +44,5 @@ pub struct NewUsers {
     pub avatar: Option<String>,
     pub publickey: String,
     pub privatekey: String,
-    pub u_id: i32,
+    pub u_id: i64,
 }

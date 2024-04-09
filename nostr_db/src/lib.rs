@@ -90,12 +90,12 @@ impl DbConnection {
             .map(|_| ())?)
     }
 
-    pub async fn query_u_id(&mut self, name: &str) -> Result<Option<String>, Error> {
+    pub async fn query_u_id(&mut self, name: &str) -> Result<Option<i64>, Error> {
         let results = self.load_users(name)?;
-        Ok(results.first().map(|user| user.u_id.to_string()))
+        Ok(results.first().map(|user| user.u_id))
     }
 
-    pub async fn quert_avatar(&mut self, name: &str) -> Result<Option<String>, Error> {
+    pub async fn query_avatar(&mut self, name: &str) -> Result<Option<String>, Error> {
         let results = self.load_users(name)?;
         Ok(results.first().and_then(|user| user.avatar.clone()))
     }
@@ -108,8 +108,8 @@ impl DbConnection {
         Ok(results.len() > 0)
     }
 
-    pub async fn uid_exists(&mut self, ch: &str) -> Result<bool, Error> {
-        let results = self.load_users(ch)?;
+    pub async fn uid_exists(&mut self, name: &str) -> Result<bool, Error> {
+        let results = self.load_users(name)?;
         Ok(!results.is_empty())
     }
 
@@ -119,7 +119,7 @@ impl DbConnection {
         av: &str,
         pk: &str,
         prk: &str,
-        uid: i32,
+        uid: i64,
     ) -> Result<(), Error> {
         use crate::schema::users::dsl::*;
 
@@ -146,6 +146,12 @@ impl DbConnection {
         Ok(results.first().map(|user| user.id))
     }
 
+    pub async fn query_user_name(&mut self, uid: i64) -> Result<Option<String>, Error> {
+        use crate::schema::users::dsl::*;
+        let results = users.filter(u_id.eq(uid)).load::<Users>(&mut self.conn)?;
+        Ok(results.first().map(|user| user.username.to_string()))
+    }
+
     pub async fn add_contents(
         &mut self,
         au: &str,
@@ -156,10 +162,7 @@ impl DbConnection {
     ) -> Result<(), Error> {
         use crate::schema::contents::dsl::*;
 
-        let u = self
-            .query_user_id(&au)
-            .await?
-            .expect("User should exist at this point");
+        let u = self.query_user_id(&au).await?.unwrap();
 
         let new_content = NewContents {
             author: au.to_string(),
